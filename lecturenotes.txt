@@ -29,6 +29,8 @@ Deployment:
     - then we deploy the backend which needs a git repository
 
 
+
+
 *** EVERYTHING we did to deploy on choreo:
 hosting database:
     - create choreo account
@@ -37,6 +39,15 @@ hosting database:
     - react_django -> backend -> backend -> settings.py -> change DATABASES variable fields
     - run in terminal: python3 manage.py migrate ( a new database will be created on their server and previous data will be gone )
 
-hosting backend:
+hosting backend (set up git repository, choreo will automatically read new updates and do automatic deployments):
     - add .gitignore to react_django, backend, and frontend folders and ignore all .env files as well as db.sqlite3
+    now we create some deployment related files
     - create .choreo folder
+    - .choereo -> endpoints.yaml -> set endpoint configurations
+
+push entire react_django folder to github:
+    - git init
+    - git add .
+    - git commit -m "first commit"
+    - git branch -M main   (change from master branch to main branch)
+    

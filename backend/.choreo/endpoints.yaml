@@ -1,0 +1,14 @@
+# where we specify the enpoints we want to deploy
+# and we want to expose from this specific component which is the backend
+# choreo will look inside this .choreo folder to find this configuration
+
+# An endpoint is a specific URL (Uniform Resource Locator) on a server where an application or a part of an application can be accessed
+
+version: 0.1
+
+endpoints:
+  - name: "REST API"
+    port: 8000
+    type: REST
+    networkVisibility: Public  # anyone will be able to use this
+    context: /  # the base path that our API should expose
