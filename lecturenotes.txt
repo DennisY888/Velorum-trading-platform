@@ -88,8 +88,10 @@ Connect frontend to backend:
       ignore the right side of the screen (only for if you are using Choreo built-in Authentication feature)
       (we build ours using django)
     - copy ServiceURL (hosted on the same domain as our frontend)
-    - go to our file directory frontend -> api.js 
+    - go to our file directory frontend -> api.js -> add our ServiceURL
+    - rebuild our frontend and redeploy
     - Choreo can interestingly deploy backend on the same origin as frontend (send and receive requests/responses within the same origin )
+
 
 If database timed out and need to be restarted:
     - navigate back to organization page, then click Dependencies -> Databases
