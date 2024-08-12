@@ -1,0 +1,42 @@
+Session vs JWT tokens:
+    after user enters the correct credentials (username and password)...
+    - session data stored in backend (server, database, etc)
+    - JWT tokens (containing meta data) stored in frontend (local storage)
+        - access token and refresh token
+        - once refresh token expires we actually have to sign back in again to make more requests to server
+    - BOTH store meta data such as user ID, authentcation state, permission level, etc.
+
+
+
+Django REST framework vs Django:
+    - Instead of function-based views, we now use class-based views
+    - Instead of manually returning JSON responses in our functions, we assign serializers to class-based views
+
+
+Serializers:
+    - takes a python object (data from model through ORM) and converts to JSON data to return the response (API)
+    - can take in python code and convert to JSON and vice versa
+
+
+Security:
+    - we protect BOTH front-end and back-end routes, not just back-end
+    - a user could technically bypass front-end authorization checks, but still good to include 
+      and prevent sending unneccesary requests
+
+
+Deployment:
+    - we first deploy the database
+    - then we deploy the backend which needs a git repository
+
+
+*** EVERYTHING we did to deploy on choreo:
+hosting database:
+    - create choreo account
+    - dependencies -> databases -> create a new database (free trial only has one)
+    - react_django -> backend -> .env -> store all database host properties as environment variables
+    - react_django -> backend -> backend -> settings.py -> change DATABASES variable fields
+    - run in terminal: python3 manage.py migrate ( a new database will be created on their server and previous data will be gone )
+
+hosting backend:
+    - add .gitignore to react_django, backend, and frontend folders and ignore all .env files as well as db.sqlite3
+    - create .choreo folder
