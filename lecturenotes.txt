@@ -45,9 +45,54 @@ hosting backend (set up git repository, choreo will automatically read new updat
     - create .choreo folder
     - .choereo -> endpoints.yaml -> set endpoint configurations
 
-push entire react_django folder to github:
+push entire react_django folder to git:
     - git init
     - git add .
     - git commit -m "first commit"
     - git branch -M main   (change from master branch to main branch)
+
+push project to github:
+    - create a new repository
+    - git remote add origin https://github.com/DennisY888/InvestIQ.git
+    - git push -u origin main   
+
+
+Pushing updated code to GitHub:
+    - git add .
+    - git commit -m "[message]"
+    - git push origin main
+
     
+Create a new project on Choreo:
+    - provide name, select Monorepo
+    - then authorize with Github
+    - select the repository
+    - don't add any components yet, we manually create them
+    - add a new service for REST API (backend), enter component name, and select python, and pivk version 3.11.x
+    - add a new Web Application, enter component name, select React, and pick version, etc. (frontend)
+
+building and deploying backend:
+    - Build -> Build Latest
+    - then deploy it, add environment variables after as secret (.env file in backend main folder)
+    - now our API is deployed, public url automatically protected from Choreo 
+      (Choreo automatically adds an API key, which we need to have to access the public url)
+    - to disable the API key, within Deploy, click "Endpoint Configurations" under the first build image and uncheck OAuth2
+
+building and deploying frontend:
+    - Build -> Build Latest
+    - Deploy -> disable Choreo authentication in Authentication Settings -> Deploy
+
+Connect frontend to backend:
+    - within frontend component, go to Dependencies -> Connections -> Create
+    - Select our Backend REST API -> provide a name for connection -> 
+      ignore the right side of the screen (only for if you are using Choreo built-in Authentication feature)
+      (we build ours using django)
+    - copy ServiceURL (hosted on the same domain as our frontend)
+    - go to our file directory frontend -> api.js 
+    - Choreo can interestingly deploy backend on the same origin as frontend (send and receive requests/responses within the same origin )
+
+If database timed out and need to be restarted:
+    - navigate back to organization page, then click Dependencies -> Databases
+If any error occurs:
+    - Observability -> Metrics
+

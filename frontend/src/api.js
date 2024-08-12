@@ -6,12 +6,12 @@
 import axios from "axios";
 import { ACCESS_TOKEN } from "./constants";
 
-const apiUrl = "/choreo-apis/awbo/backend/rest-api-be2/v1.0";
-
-
+// after we connected our frontend to backend on Choreo
+const apiUrl = "/choreo-apis/investiq/backend/v1";
 
 const api = axios.create({
   // allows us to import any variable specified in the .env file (environment variable file)
+  // we will use our apiUrl if our web app is in the deployed environment (no more .env file since we ignored them on GitHub)
   baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : apiUrl,
 });
 
