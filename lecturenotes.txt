@@ -98,3 +98,20 @@ If database timed out and need to be restarted:
 If any error occurs:
     - Observability -> Metrics
 
+
+
+
+
+
+Major setups when hosting:
+
+deploying database:
+    - PostgreSQL -> Digital Ocean Service (auto managed)
+    - added .env file in backend app folder and changed settings.py database 
+set up GitHub
+    - add .env files
+backend:
+    - creat service
+frontend:
+    - create web app
+build and deploy each 

@@ -1,0 +1,42 @@
+/* Watchlist.css */
+.watchlist-container {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .watchlist-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+  }
+  
+  .stock-card {
+    width: calc(33.333% - 20px); /* 3 cards per row with some gap */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .stock-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .loading-spinner {
+    margin: 20px auto;
+  }
+  
+  @media (max-width: 768px) {
+    .stock-card {
+      width: calc(50% - 20px); /* 2 cards per row on smaller screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .stock-card {
+      width: 100%; /* 1 card per row on mobile devices */
+    }
+  }
+  

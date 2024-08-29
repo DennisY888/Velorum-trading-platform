@@ -47,6 +47,8 @@ function Form({ route, method }) {
     const name = method === "login" ? "Login" : "Register";
 
 
+
+
     return (
         <form onSubmit={handleSubmit} className="form-container">
             <h1>{name}</h1>

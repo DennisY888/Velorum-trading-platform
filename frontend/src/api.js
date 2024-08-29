@@ -1,45 +1,112 @@
-// this is an interceptor, automatically intercepts any requests we are going to send and add correct headers
-// we will use axios, a clean way to send network requests
-// in our case, everytime we send request our access token will be automatically added to the request
-
-
 import axios from "axios";
-import { ACCESS_TOKEN } from "./constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "./constants";
+import {jwtDecode} from "jwt-decode";
 
-// after we connected our frontend to backend on Choreo
+
+
+// API URL Configuration
 const apiUrl = "/choreo-apis/investiq/backend/v1";
 
+
+
 const api = axios.create({
-  // allows us to import any variable specified in the .env file (environment variable file)
-  // we will use our apiUrl if our web app is in the deployed environment (no more .env file since we ignored them on GitHub)
   baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : apiUrl,
 });
 
 
 
-// takes a function as argument
-// telling Axios to run some code right before every request is sent out
-api.interceptors.request.use(
-  
-  // look into our local storage to see if there is an access token
-  // if there is we add that token as autorization header to our request
+// Function to Refresh Token
+const refreshToken = async () => {
 
-  // config contains all the details about the request, such as the method (GET, POST, etc.), the URL, headers,
-  (config) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    if (token) {
-      // axios allows us to access the Authorization header and add to it
-      config.headers.Authorization = `Bearer ${token}`;
+  const base = import.meta.env.VITE_API_URL
+
+  try {
+    const refresh = localStorage.getItem(REFRESH_TOKEN);
+    console.log("This is my Refresh Token retrieved in refreshToken():", refresh)
+
+    if (!refresh) {
+      throw new Error("Refresh token not found");
+    }
+
+    const response = await axios.post(`${base}/api/token/refresh/`, { refresh });
+
+    console.log("This is my Access Token refreshed in refreshToken():", response.data.access)
+
+    localStorage.setItem(ACCESS_TOKEN, response.data.access);
+    return response.data.access;
+  } catch (error) {
+    console.log("Refresh Token Error:", error)
+    localStorage.removeItem(ACCESS_TOKEN);
+    localStorage.removeItem(REFRESH_TOKEN);
+    throw error;
+  }
+};
+
+
+
+// Request Interceptor
+api.interceptors.request.use(
+  async (config) => {
+    try {
+      let token = localStorage.getItem(ACCESS_TOKEN);
+      console.log("This is my Access Token from request interceptor:", token)
+      if (token) {
+
+        const tokenExpiryTime = jwtDecode(token).exp * 1000;
+        const currentTime = new Date().getTime();
+
+        if (tokenExpiryTime - currentTime < 5 * 60 * 1000) {
+          token = await refreshToken();
+          console.log("This should be my Refresh Token from request interceptor retrieved from refreshToken():", token)
+        } 
+
+        config.headers.Authorization = `Bearer ${token}`;
+      } 
+    } catch (error) {
+      console.log("Request Interceptor Error:", error)
+      throw error;
     }
     return config;
   },
 
-  // second function
+  // this "redirects" error to catch statements used within our code in React to make HTTP requests
   (error) => {
     return Promise.reject(error);
   }
 );
 
 
-// now we start using api instead of default axios object
+
+// Response Interceptor
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const token = await refreshToken();
+        console.log("This should be my Refresh Token from response interceptor retrieved from refreshToken():", token)
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return api(originalRequest);
+      } catch (error) {
+        console.log("Response Interceptor Error:", error)
+        localStorage.removeItem(ACCESS_TOKEN);
+        localStorage.removeItem(REFRESH_TOKEN);
+        return Promise.reject(error);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+
+
+// Export the API instance
 export default api;

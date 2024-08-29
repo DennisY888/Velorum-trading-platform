@@ -1,0 +1,64 @@
+.leaderboard-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .search-bar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .autocomplete-dropdown {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  .autocomplete-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+  
+  .autocomplete-item:last-child {
+    border-bottom: none;
+  }
+  
+  .autocomplete-item:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .leaderboard-table th, .leaderboard-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .leaderboard-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .leaderboard-table tbody {
+    display: block;
+    max-height: 400px;
+    overflow-y: scroll;
+  }
+  
+  .leaderboard-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
