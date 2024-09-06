@@ -9,23 +9,23 @@ const Leaderboard = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [autoLoading, setAutoLoading] = useState(false);
-
-
+  const [initialLoad, setInitialLoad] = useState(true);
 
   // Function to fetch the top 10 users
   const fetchTopUsers = useCallback(async () => {
-    setLoading(true);
+    if (initialLoad) {
+      setLoading(true);
+    }
     try {
       const response = await api.get('/api/leaderboard/');
       setTopUsers(response.data);
+      setInitialLoad(false);
     } catch (error) {
       console.error('Error fetching top users:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
-
-
+  }, [initialLoad]);
 
   // Fetch top 10 users on component mount and every minute for real-time updates
   useEffect(() => {
@@ -37,8 +37,6 @@ const Leaderboard = () => {
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, [fetchTopUsers]);
-
-
 
   // Debounced search input change
   const fetchFilteredUsers = useCallback(
@@ -58,29 +56,29 @@ const Leaderboard = () => {
         setAutoLoading(false);
       }
     }, 300),
-    []);
-
-
+    []
+  );
 
   useEffect(() => {
     fetchFilteredUsers(searchQuery);
   }, [searchQuery, fetchFilteredUsers]);
 
-
-
   const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value);
   }, []);
 
-
+  const handleClick = (user) => {
+    setSearchQuery('');
+    setFilteredUsers([]);
+  };
 
   const renderTableRows = useCallback(
     (users) => {
       return users.map((user) => (
-        <tr key={user.user}>
-          <td>{user.user}</td>
-          <td>{user.total_value}</td>
-          <td>{user.ranking}</td>
+        <tr key={user.user} className="hover:bg-slate-700">
+          <td className="p-4">{user.user}</td>
+          <td className="p-4">{user.total_value}</td>
+          <td className="p-4">{user.ranking}</td>
         </tr>
       ));
     },
@@ -88,20 +86,22 @@ const Leaderboard = () => {
   );
 
 
-
   const renderDropdownItems = useCallback(
     (users) => {
       if (autoLoading) {
         return (
-          <div className="autocomplete-item">
+          <div className="p-4 hover:bg-slate-700 text-blue-100 cursor-pointer">
             <p>Loading...</p>
           </div>
         );
       } else if (users.length > 0) {
         return users.map((user) => (
-          <div key={user.user} className="autocomplete-item">
-            <p>{user.user}</p>
-            <p>{user.total_value}</p>
+          <div
+            key={user.user}
+            onClick={() => handleClick(user.user)}
+            className="p-4 hover:bg-slate-700 text-blue-100 cursor-pointer"
+          >
+            <p>{user.user} - {user.total_value}</p>
             <p>Rank: {user.ranking}</p>
           </div>
         ));
@@ -113,37 +113,52 @@ const Leaderboard = () => {
   );
 
 
-
-  if (loading) {
-    return <h1>Loading...</h1>;
+  
+  if (loading && initialLoad) {
+    return (
+      <div className="loader-container">
+        <div className="loader">
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <h1>Loading Leaderboard...</h1>
+      </div>
+    );
   }
-
-
 
   return (
     <div className="leaderboard-container">
-      <h1>Leaderboard</h1>
-      <input
-        type="text"
-        placeholder="Search for a user..."
-        value={searchQuery}
-        onChange={handleSearchChange}
-        className="search-bar"
-      />
-      {(searchQuery && (autoLoading || filteredUsers.length > 0)) && (
-        <div className="autocomplete-dropdown">
-          {renderDropdownItems(filteredUsers)}
-        </div>
-      )}
+      <h1 className="text-5xl font-bold text-blue-100 mb-6">Leaderboard</h1>
+      
+      {/* Search Input and Autocomplete */}
+      <div className='w-full max-w-lg relative' style={{ margin: '0 auto 20px' }}>
+        <input
+          type="text"
+          placeholder="Search for a user..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="w-full p-4 text-xl rounded-full bg-slate-800 text-blue-100 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-slate-600 caret-blue-200"
+          style={{
+            textShadow: '0 0 8px rgba(255, 255, 255, 0.7)',
+            animation: 'glow 1s infinite alternate' // Blinking glow effect
+          }}
+        />
+        {(searchQuery && (autoLoading || filteredUsers.length > 0)) && (
+          <div className="absolute w-full mt-1 rounded-lg bg-gradient-to-r from-slate-800 to-slate-900 shadow-lg overflow-hidden z-10">
+            {renderDropdownItems(filteredUsers)}
+          </div>
+        )}
+      </div>
+
+      {/* Leaderboard Table */}
       <table className="leaderboard-table">
         <thead>
-          <tr>
-            <th>Username</th>
-            <th>Portfolio Value</th>
-            <th>Ranking</th>
+          <tr className="bg-slate-800 text-blue-100">
+            <th className="p-4">Username</th>
+            <th className="p-4">Portfolio Value</th>
+            <th className="p-4">Ranking</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-blue-100">
           {renderTableRows(topUsers)}
         </tbody>
       </table>

@@ -1,87 +1,141 @@
 /* Container for the transaction history */
 .transaction-history-container {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-    font-family: Arial, sans-serif;
+  padding: 25px; /* Maintained padding for spacing */
+  width: 75%; /* Occupy 75% of the screen width */
+  height: 70vh; /* Occupy 70% of the screen height */
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+/* Table container to make it scrollable */
+.table-container {
+  max-height: 100%; /* Max height matches the container's height */
+  overflow-y: auto;
+  overflow-x: auto; /* Added horizontal scroll for large tables */
+  border: 1px solid rgba(148, 163, 184, 0.1); /* Slightly lighter border */
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(15, 23, 42, 0.3); /* Enhanced shadow with a slate-900 color tone */
+}
+
+/* Styling the transaction table */
+.transaction-table {
+  width: 100%;
+  background-color: rgba(30, 41, 59, 0.85); /* Matching with bg color (slate-800 with some transparency) */
+  border: 1px solid rgba(148, 163, 184, 0.2); /* Lighter border to blend better */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.5), 0 2px 4px -1px rgba(15, 23, 42, 0.3); /* Slightly darker shadow */
+  border-collapse: collapse;
+}
+
+.transaction-table thead {
+  background-color: rgba(51, 65, 85, 0.95); /* Slightly lighter shade to distinguish header (slate-700) */
+}
+
+.transaction-table th,
+.transaction-table td {
+  padding: 1.2rem 1.8rem; /* Adjusted padding for a responsive row size */
+  text-align: left;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2); /* Light border to maintain consistency */
+  font-size: 1rem; /* Adjusted font size for scalability */
+}
+
+.transaction-table th {
+  font-size: 1rem; /* Adjusted font size */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #cbd5e1; /* Consistent medium gray text */
+}
+
+.transaction-table td {
+  font-size: 1rem; /* Adjusted font size */
+  color: #e2e8f0; /* Dark gray text */
+}
+
+/* Adding a hover effect on table rows */
+.transaction-table tbody tr:hover {
+  background-color: rgba(71, 85, 105, 0.8); /* Slightly lighter background on hover (slate-600) */
+}
+
+/* Green tint for buy transactions */
+.row-buy {
+  background-color: rgba(30, 41, 59, 0.85); /* Original background color */
+  background-blend-mode: overlay; /* Blend the hint of green */
+  background-image: linear-gradient(rgba(0, 128, 0, 0.1), rgba(0, 128, 0, 0.1)); /* Hint of green */
+}
+
+.row-buy:hover {
+  background-color: rgba(71, 85, 105, 0.8); /* Original hover color */
+  background-blend-mode: overlay;
+  background-image: linear-gradient(rgba(0, 128, 0, 0.1), rgba(0, 128, 0, 0.1)); /* Hint of green on hover */
+}
+
+/* Red tint for sell transactions */
+.row-sell {
+  background-color: rgba(30, 41, 59, 0.85); /* Original background color */
+  background-blend-mode: overlay; /* Blend the hint of red */
+  background-image: linear-gradient(rgba(255, 0, 0, 0.1), rgba(255, 0, 0, 0.1)); /* Hint of red */
+}
+
+.row-sell:hover {
+  background-color: rgba(71, 85, 105, 0.8); /* Original hover color */
+  background-blend-mode: overlay;
+  background-image: linear-gradient(rgba(255, 0, 0, 0.1), rgba(255, 0, 0, 0.1)); /* Hint of red on hover */
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.loading-spinner::before {
+  content: '';
+  width: 30px;
+  height: 30px;
+  border: 4px solid rgba(148, 163, 184, 0.5); /* Lighter spinner border to match the theme */
+  border-top: 4px solid rgba(100, 116, 139, 1); /* Slate color for the spinner */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
-  
-  /* Table container to make it scrollable */
-  .table-container {
-    max-height: 400px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  100% {
+    transform: rotate(360deg);
   }
-  
-  /* Styling the transaction table */
-  .transaction-table {
-    width: 100%;
-    border-collapse: collapse;
+}
+
+/* Responsive design for medium screens (tablets) */
+@media (max-width: 768px) {
+  .transaction-history-container {
+    padding: 20px; /* Slightly reduced padding */
+    width: 85%; /* Slightly increased width on medium screens */
+    height: 65vh; /* Adjusted height for better fit */
   }
-  
-  .transaction-table thead {
-    background-color: #f2f2f2;
-  }
-  
+
   .transaction-table th,
   .transaction-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+    padding: 1rem 1.5rem; /* Slightly reduced padding for medium screens */
+    font-size: 0.95rem; /* Slightly smaller font size */
   }
-  
-  /* Adding a hover effect on table rows */
-  .transaction-table tbody tr:hover {
-    background-color: #f9f9f9;
-  }
-  
-  /* Loading and no more transactions text */
-  .transaction-history-container p {
-    text-align: center;
-    color: #888;
-    margin-top: 10px;
-  }
-  
-  /* Responsive design for smaller screens */
-  @media (max-width: 600px) {
-    .transaction-history-container {
-      padding: 10px;
-    }
-  
-    .transaction-table th,
-    .transaction-table td {
-      padding: 8px;
-      font-size: 14px;
-    }
-  }
-  
+}
 
+/* Responsive design for small screens (phones) */
+@media (max-width: 600px) {
+  .transaction-history-container {
+    padding: 15px; /* Further reduced padding for small screens */
+    width: 95%; /* Full width for small screens */
+    height: 70vh; /* Adjusted height for smaller screens */
+  }
 
-  .loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
+  .transaction-table th,
+  .transaction-table td {
+    padding: 0.75rem 1rem; /* Reduced padding for smaller screens */
+    font-size: 0.9rem; /* Smaller font size for readability on small screens */
   }
-  
-  .loading-spinner::before {
-    content: '';
-    width: 30px;
-    height: 30px;
-    border: 4px solid #ccc;
-    border-top: 4px solid #000;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-  
+}

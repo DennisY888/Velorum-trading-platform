@@ -1,68 +1,228 @@
-/* Container for the whole page */
-div {
-    font-family: Arial, sans-serif;
+/* Home page container */
+.home {
+  padding: 25px;
+  background-color: #0f172a;
+  min-height: 100vh;
+  color: #e2e8f0;
+}
+
+/* Welcome section layout */
+.welcome-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Welcome message styling */
+.welcome-message h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #60a5fa;
+  margin-right: 20px;
+}
+
+/* Username styling */
+.content {
+  position: relative;
+  font-size: 0; /* Remove inline spacing between the h2 elements */
+}
+
+.content h2 {
+  position: absolute;
+  font-size: 3em;
+  font-weight: bold;
+}
+
+.content h2:nth-child(1) {
+  color: transparent;
+  -webkit-text-stroke: 2px #1b7cf3;
+}
+
+.content h2:nth-child(2) {
+  color: #1b7cf3;
+  animation: animate 4s ease-in-out infinite;
+}
+
+@keyframes animate {
+  0%, 100% {
+    clip-path: polygon(0% 45%, 15% 44%, 32% 50%, 54% 60%, 70% 61%, 84% 59%, 100% 52%, 100% 100%, 0% 100%);
   }
-  
-  /* Styles for the notes section */
-  .notes-section {
-    margin-bottom: 2rem;
+  50% {
+    clip-path: polygon(0% 60%, 16% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%);
   }
-  
-  .notes-section h2 {
-    color: #333;
-    font-size: 24px;
+}
+
+/* Portfolio summary */
+.portfolio-summary {
+  margin-top: 20px;
+  text-align: left;
+  background-color: #1e293b;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(15, 23, 42, 0.3);
+}
+
+.portfolio-summary h1 {
+  font-size: 2rem;
+  color: #60a5fa;
+  margin-bottom: 10px;
+}
+
+.portfolio-summary p {
+  font-size: 1.2rem;
+  color: #cbd5e1;
+}
+
+.portfolio-summary span {
+  font-weight: bold;
+  color: #38bdf8;
+}
+
+/* No holdings message */
+.no-holdings {
+  font-size: 1.5rem;
+  color: #94a3b8;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Portfolio table */
+.portfolio-table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  background-color: #1e293b;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(15, 23, 42, 0.3);
+}
+
+.portfolio-table th, .portfolio-table td {
+  padding: 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.portfolio-table th {
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.portfolio-table td {
+  font-size: 1rem;
+}
+
+.portfolio-table tr:nth-child(even) {
+  background-color: #2d3748;
+}
+
+.portfolio-table tr:hover {
+  background-color: #4a5568;
+}
+
+/* Loader */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  width: 100px;
+  position: relative;
+}
+
+.loader div {
+  width: 16px;
+  height: 16px;
+  background: #60a5fa;
+  border-radius: 50%;
+  position: absolute;
+  animation: loaderAnimation 1.2s infinite ease-in-out both;
+}
+
+.loader div:nth-child(1) {
+  top: 0;
+  left: 42px;
+  animation-delay: -0.45s;
+}
+
+.loader div:nth-child(2) {
+  top: 14px;
+  left: 14px;
+  animation-delay: -0.3s;
+}
+
+.loader div:nth-child(3) {
+  top: 42px;
+  left: 0;
+  animation-delay: -0.15s;
+}
+
+.loader div:nth-child(4) {
+  top: 14px;
+  right: 14px;
+  animation-delay: 0s;
+}
+
+@keyframes loaderAnimation {
+  0%, 100% {
+    transform: scale(1);
   }
-  
-  /* Styles for individual notes - assuming your Note component has some container element */
-  .note {
-    background-color: #f9f9f9;
-    border-left: 5px solid #007bff;
-    margin: 10px 0;
-    padding: 10px 15px;
-    border-radius: 5px;
+  50% {
+    transform: scale(1.5);
   }
-  
-  /* Styles for the form section */
-  form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    margin: auto;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .welcome-section {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  form h2 {
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 20px;
+
+  .welcome-message h1 {
+    margin-right: 0;
+    margin-bottom: 10px;
   }
-  
-  form label {
-    font-weight: bold;
-    margin-top: 10px;
+
+  .portfolio-summary h1, .portfolio-summary p {
+    text-align: left;
   }
-  
-  form input,
-  form textarea {
-    width: 100%;
-    padding: 8px;
-    margin: 8px 0 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .portfolio-summary {
+    padding: 15px;
   }
-  
-  form input[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
+
+  .portfolio-table th, .portfolio-table td {
+    padding: 0.75rem;
+    font-size: 0.9rem;
   }
-  
-  form input[type="submit"]:hover {
-    background-color: #0056b3;
+
+  .content h2 {
+    font-size: 2em;
   }
+}
+
+
+/* Green glow for positive changes */
+.glow-green {
+  color: #22c55e; /* Tailwind's green-500 */
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.8), 0 0 12px rgba(34, 197, 94, 0.6);
+}
+
+/* Red glow for negative changes */
+.glow-red {
+  color: #ef4444; /* Tailwind's red-500 */
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.8), 0 0 12px rgba(239, 68, 68, 0.6);
+}

@@ -10,9 +10,11 @@ const Buy = () => {
   };
 
   return (
-    <div className="buy-page">
-      <h1>Search Up Any Stock</h1>
-      <SearchInput onSymbolSelected={handleSymbolSelected} isSellPage={false} />
+    <div className="flex flex-col items-center justify-center min-h-screen px-4">
+      <div className="flex flex-col items-center">
+        <h1 className="text-5xl font-bold text-blue-100 mb-10" style={{ marginTop: '-150px' }}>Find Your Desired Stock</h1>
+        <SearchInput onSymbolSelected={handleSymbolSelected} isSellPage={false} />
+      </div>
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/Navbar.css";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -12,22 +11,58 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar">
-      <ul>
+    <nav className="bg-gradient-to-l from-slate-800 to-slate-900 p-4 shadow-lg">
+      <ul className="list-none m-0 p-0 flex justify-around">
         {isLoggedIn ? (
           <>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/buy">Search/Buy</Link></li>
-            <li><Link to="/sell">Sell</Link></li>
-            <li><Link to="/history">History</Link></li>
-            <li><Link to="/leaderboard">Leaderboard</Link></li>
-            <li><Link to="/watchlist">Watchlist</Link></li>
-            <li><Link to="/logout">Logout</Link></li>
+            <li className="inline font-semibold">
+              <Link to="/" className="nav-link">
+                Home
+              </Link>
+            </li>
+            <li className="inline font-semibold">
+              <Link to="/buy" className="nav-link">
+                Search/Buy
+              </Link>
+            </li>
+            <li className="inline font-semibold">
+              <Link to="/sell" className="nav-link">
+                Sell
+              </Link>
+            </li>
+            <li className="inline font-semibold">
+              <Link to="/history" className="nav-link">
+                History
+              </Link>
+            </li>
+            <li className="inline font-semibold">
+              <Link to="/leaderboard" className="nav-link">
+                Leaderboard
+              </Link>
+            </li>
+            <li className="inline font-semibold">
+              <Link to="/watchlist" className="nav-link">
+                Watchlist
+              </Link>
+            </li>
+            <li className="inline font-semibold">
+              <Link to="/logout" className="nav-link">
+                Logout
+              </Link>
+            </li>
           </>
         ) : (
           <>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/register">Register</Link></li>
+            <li className="inline font-semibold">
+              <Link to="/login" className="nav-link">
+                Login
+              </Link>
+            </li>
+            <li className="inline font-semibold">
+              <Link to="/register" className="nav-link">
+                Register
+              </Link>
+            </li>
           </>
         )}
       </ul>

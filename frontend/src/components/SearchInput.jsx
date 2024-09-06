@@ -18,6 +18,7 @@ const SearchInput = ({ onSymbolSelected, isSellPage }) => {
   }, []);
 
 
+
   // Debounced function to fetch autocomplete suggestions for the Sell page
   const fetchSuggestions = useCallback(
     debounce(async (query) => {
@@ -67,36 +68,48 @@ const SearchInput = ({ onSymbolSelected, isSellPage }) => {
 
 
   return (
-    <div className="search-input">
-      <input
-        type="text"
-        value={query}
-        onChange={handleInputChange}
-        onKeyPress={handleKeyPress}
-        placeholder="Enter stock symbol"
-      />
+      <div className='w-full max-w-lg relative' >
+
+          <input
+            type="text"
+            value={query}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            placeholder="Enter stock symbol"
+            className="w-full p-4 text-xl rounded-full bg-slate-800 text-blue-100 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-slate-600 caret-blue-200"
+            style={{ 
+              textShadow: '0 0 8px rgba(255, 255, 255, 0.7)', // White glow effect
+              animation: 'glow 1s infinite alternate' // Blinking glow effect
+            }}
+          />
+
       {isDropdownVisible && (
-        <div className="autocomplete-dropdown">
+        <div className="absolute w-full mt-1 rounded-lg bg-gradient-to-r from-slate-800 to-slate-900 shadow-lg overflow-hidden z-10">
           {autoLoading ? (
-            <div className="autocomplete-item">
+            <div className="p-4 hover:bg-slate-700 text-blue-100 cursor-pointer">
               <p>Loading...</p>
             </div>
           ) : (
-            suggestions.map((stock) => (
-              <div
-                key={stock.symbol}
-                onClick={() => handleSelectSuggestion(stock.symbol)}
-                className="autocomplete-item"
-              >
-                <p>{stock.symbol} - {stock.name}</p>
-              </div>
-            ))
+            suggestions
+              .filter((stock) => stock && stock.symbol)  // Filter out null or invalid stocks
+              .map((stock) => (
+                <div
+                  key={stock.symbol}
+                  onClick={() => handleSelectSuggestion(stock.symbol)}
+                  className="p-4 hover:bg-slate-700 text-blue-100 cursor-pointer"
+                >
+                  <p>{stock.symbol} - {stock.name}</p>
+                </div>
+              ))
           )}
+
         </div>
       )}
 
     </div>
   );
 };
+
+
 
 export default React.memo(SearchInput);

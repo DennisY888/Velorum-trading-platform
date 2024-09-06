@@ -1,64 +1,92 @@
+/* Leaderboard.css */
 .leaderboard-container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #0f172a; /* Deep slate color for background */
+  min-height: 100vh;
+  width: 100%; /* Ensure the container takes full width */
+}
+
+/* Leaderboard table container */
+.leaderboard-table {
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 20px;
+  border-collapse: collapse;
+  background-color: #1e293b; /* Slate color for table */
+  border-radius: 10px;
+  overflow: hidden;
+  overflow-x: auto; /* Horizontal scroll for small screens */
+}
+
+/* Table heading and cells */
+.leaderboard-table th, .leaderboard-table td {
+  padding: 12px 20px;
+  text-align: left;
+  white-space: nowrap; /* Prevents text from breaking in table cells */
+}
+
+.leaderboard-table th {
+  background-color: #1e293b; /* Darker slate background for header */
+}
+
+.leaderboard-table tr:nth-child(even) {
+  background-color: #2d3748; /* Alternate row colors */
+}
+
+.leaderboard-table tr:hover {
+  background-color: #4a5568; /* Row hover effect */
+}
+
+/* Autocomplete dropdown styles */
+.autocomplete-dropdown {
+  background-color: #1e293b; /* Matching slate background */
+  border-radius: 8px;
+  margin-top: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.autocomplete-item:hover {
+  background-color: #2d3748; /* Hover effect */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .leaderboard-container {
+    padding: 15px; /* Reduce padding on medium screens */
   }
-  
-  .search-bar {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .autocomplete-dropdown {
-    position: absolute;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    width: 100%;
-    z-index: 1000;
-  }
-  
-  .autocomplete-item {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    cursor: pointer;
-  }
-  
-  .autocomplete-item:last-child {
-    border-bottom: none;
-  }
-  
-  .autocomplete-item:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .leaderboard-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
+
   .leaderboard-table th, .leaderboard-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+    padding: 10px 15px; /* Adjust padding for readability */
+    font-size: 0.9rem; /* Slightly smaller font size */
   }
-  
-  .leaderboard-table th {
-    background-color: #f2f2f2;
+}
+
+@media (max-width: 600px) {
+  .leaderboard-container {
+    padding: 10px; /* Further reduce padding for small screens */
   }
-  
-  .leaderboard-table tbody {
-    display: block;
-    max-height: 400px;
-    overflow-y: scroll;
+
+  .leaderboard-table th, .leaderboard-table td {
+    padding: 8px 10px; /* More compact padding for small screens */
+    font-size: 0.85rem; /* Further reduce font size for readability */
   }
-  
-  .leaderboard-table tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
+
+  .leaderboard-table {
+    font-size: 0.85rem; /* Reduce font size for smaller screens */
+    overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
   }
-  
+
+  .autocomplete-item {
+    padding: 8px; /* Reduce padding in the autocomplete dropdown */
+    font-size: 0.85rem; /* Smaller font size for dropdown */
+  }
+}

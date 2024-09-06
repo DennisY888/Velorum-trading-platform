@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import api from "../api";
+import "../styles/Home.css";
 
 function Home() {
   const [portfolio, setPortfolio] = useState([]);
   const [cash, setCash] = useState(0);
+  const [username, setUsername] = useState("");
   const [grandTotal, setGrandTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(true);  // New state to track initial load
+  const [initialLoad, setInitialLoad] = useState(true);
 
-  // useCallback to memoize the fetch function and prevent unnecessary re-creations
   const fetchPortfolio = useCallback(() => {
     if (initialLoad) {
       setLoading(true);
@@ -17,9 +18,10 @@ function Home() {
     api.get("/api/index/")
       .then((response) => {
         setPortfolio(response.data.portfolio);
+        setUsername(response.data.username);
         setCash(response.data.cash);
         setGrandTotal(response.data.grand_total);
-        setInitialLoad(false);  // Mark initial load as complete
+        setInitialLoad(false);
       })
       .catch((error) => {
         console.error("Error fetching portfolio data:", error);
@@ -27,33 +29,43 @@ function Home() {
       .finally(() => {
         setLoading(false);
       });
-  }, [initialLoad]);  // Include initialLoad as a dependency
+  }, [initialLoad]);
 
   useEffect(() => {
-    // Initial fetch when the component mounts
     fetchPortfolio();
-
-    // Set up an interval to fetch data every minute for real-time updates
     const intervalId = setInterval(fetchPortfolio, 60000);
-
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
-  }, [fetchPortfolio]); // Dependency ensures this effect runs only when fetchPortfolio changes
+  }, [fetchPortfolio]);
 
-  if (loading && initialLoad) {  // Only show loading during the initial load
-    return <h1>Loading...</h1>;
+  if (loading && initialLoad) {
+    return (
+      <div className="loader-container">
+        <div className="loader">
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <h1>Loading Portfolio...</h1>
+      </div>
+    );
   }
+
+
 
   return (
     <div className="home">
+      <div className="welcome-section">
+        <div className="welcome-message">
+          <h1>Welcome, {username}</h1>
+        </div>
+      </div>
+
       <div className="portfolio-summary">
-        <h1>Portfolio Overview</h1>
-        <p>Total Portfolio Value: ${grandTotal.toFixed(2)}</p>
-        <p>Current Cash: ${cash.toFixed(2)}</p>
+        <h1 className="portfolio-title">Portfolio Overview</h1>
+        <p>Total Portfolio Value: <span>${grandTotal.toFixed(2)}</span></p>
+        <p>Current Cash: <span>${cash.toFixed(2)}</span></p>
       </div>
 
       {portfolio.length === 0 ? (
-        <h1>No Stock Holdings</h1>
+        <h1 className="no-holdings">No Stock Holdings</h1>
       ) : (
         <table className="portfolio-table">
           <thead>
@@ -72,7 +84,10 @@ function Home() {
                 <td>{stock.shares}</td>
                 <td>${stock.current_price.toFixed(2)}</td>
                 <td>${stock.total_value.toFixed(2)}</td>
-                <td>{stock.daily_change.toFixed(2)}%</td>
+                <td className={stock.daily_change >= 0 ? "glow-green" : "glow-red"}>
+                  {stock.daily_change.toFixed(2)}%
+                </td>
+
               </tr>
             ))}
           </tbody>

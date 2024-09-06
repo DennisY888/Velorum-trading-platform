@@ -27,7 +27,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 
-# Portfolio model to track each user's stock holdings
+# Track each user's individual stock holdings
 class Portfolio(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='portfolios')
     symbol = models.CharField(max_length=10)
@@ -38,6 +38,9 @@ class Portfolio(models.Model):
 
     class Meta:
         unique_together = ('user', 'symbol')
+        indexes = [
+            models.Index(fields=['user', 'symbol']),
+        ]
 
 
 
@@ -61,6 +64,9 @@ class History(models.Model):
         constraints = [
             CheckConstraint(check=Q(shares__gte=1), name='shares_positive')
         ]
+        indexes = [
+            models.Index(fields=['user', 'transacted']),
+        ]
 
 
 
@@ -74,3 +80,6 @@ class Watchlist(models.Model):
     
     class Meta:
         unique_together = ('user', 'symbol')
+        indexes = [
+            models.Index(fields=['user', 'symbol']),
+        ]

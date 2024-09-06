@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from "../api";
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import NotFound from './NotFound'; // Assuming NotFound is already implemented
+import NotFound from './NotFound'; 
+import RemoveFromWatchlistButton from '../components/RemoveFromWatchlistButton';
+import "../styles/Quote.css";
 
 const Quote = () => {
   const [searchParams] = useSearchParams();
@@ -12,40 +14,38 @@ const Quote = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);  // To handle errors
+  const [initialLoad, setInitialLoad] = useState(true);
 
 
 
   const fetchStockData = useCallback(async () => {
-    setLoading(true);
+    if (initialLoad) {
+      setLoading(true);
+    }
     try {
       let response;
       if (action === 'sell') {
-        // Fetch from user's owned stocks for Sell page
         response = await api.get(`/api/search-owned-stocks/?q=${symbol}`);
       } else {
-        // Fetch from the entire stock market for Buy page
         response = await api.get(`/api/quote/${symbol}/`);
       }
 
-
       if (response.data && response.data.length > 0) {
-        // For Sell page, the response might return an array of matching stocks
-        setStockData(response.data[0]); // Assuming we're interested in the first match
+        setStockData(response.data[0]);
       } else if (response.data && (action === 'buy' || action === 'watch')) {
-        // For Buy page, if we get a valid response with data, set it
         setStockData(response.data);
       } else {
-        // If no valid data, treat it as not found
         setStockData(null);
       }
+
+      setInitialLoad(false);
     } catch (error) {
       console.error('Error fetching stock data:', error);
-      setStockData(null); // In case of an error, treat it as not found
+      setStockData(null);
     } finally {
       setLoading(false);
     }
-  }, [symbol, action]);
-
+  }, [symbol, action, initialLoad]);
 
 
 
@@ -54,7 +54,7 @@ const Quote = () => {
 
     const intervalId = setInterval(() => {
       fetchStockData();
-    }, 60000); // Refresh every 60 seconds
+    }, 60000);
 
     return () => clearInterval(intervalId);
   }, [fetchStockData]);
@@ -70,11 +70,21 @@ const Quote = () => {
   const handleAction = useCallback(async () => {
     const endpoint = action === 'buy' ? '/api/portfolio/buy/' : '/api/portfolio/sell/';
     setLoading(true);
+    setError(null);  // Reset error before starting
     try {
       await api.post(endpoint, { symbol, shares });
       navigate('/');
     } catch (error) {
-      console.error(`Error performing ${action}:`, error);
+      // Assuming backend sends a status code 400 for insufficient funds or not enough shares
+      if (error.response && error.response.status === 400) {
+        if (action === 'buy') {
+          setError('Insufficient funds to complete the purchase.');
+        } else if (action === 'sell') {
+          setError('Not enough shares to complete the sale.');
+        }
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -82,10 +92,9 @@ const Quote = () => {
 
 
 
-  // New function to handle adding to watchlist
   const handleAddToWatchlist = useCallback(async () => {
     setLoading(true);
-    setError(null);  // Reset error state
+    setError(null);
     try {
       await api.post("/api/watchlist/add_to_watchlist/", { symbol });
       alert("Stock added to watchlist!");
@@ -100,27 +109,17 @@ const Quote = () => {
 
 
 
-  const handleRemoveFromWatchlist = useCallback(async () => {
-    setLoading(true);
-    setError(null);  // Reset error state
-    try {
-      await api.delete("/api/watchlist/remove_from_watchlist/", { data: {symbol} });
-      alert("Stock removed from watchlist!");
-      navigate('/watchlist');
-    } catch (error) {
-      console.error("Error removing stock from watchlist:", error);
-      setError("Failed to remove stock from watchlist. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [symbol]);
-
-
-
-
-  if (loading) {
-    return <h1>Loading...</h1>;
+  if (loading && initialLoad) {
+    return (
+      <div className="loader-container">
+        <div className="loader">
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <h1>Loading Stock Data...</h1>
+      </div>
+    );
   }
+
 
 
   if (!stockData) {
@@ -128,51 +127,61 @@ const Quote = () => {
   }
 
 
+  
   return (
-    <div className="quote-page">
-      <h1>{stockData.symbol} - {stockData.name}</h1>
-      <p>Current Price: ${stockData.current_price}</p>
-      <p>Opening Price: ${stockData.opening_price}</p>
-      <p>Previous Close: ${stockData.previous_close}</p>
-      <p>High Price: ${stockData.high_price}</p>
-      <p>Low Price: ${stockData.low_price}</p>
-      <p>10 Day Avg Volume: {stockData.ten_day_avg_volume}M</p>
-      <p>3 Month Avg Volume: {stockData.three_month_avg_volume}M</p>
-      <p>Market Cap: {stockData.market_cap}M</p>
-      <p>P/E Ratio: {stockData.pe_ratio}</p>
-      <p>Annual Dividend Yield: {stockData.annual_dividend_yield}%</p>
-      <p>52 Week High: ${stockData['52_week_high']}</p>
-      <p>52 Week Low: ${stockData['52_week_low']}</p>
-      <p>Beta: {stockData.beta}</p>
-      <p>Exchange: {stockData.exchange}</p>
-      
-      
+    <div className="quote-page text-slate-100 p-6 md:p-12">
+      <h1 className="text-6xl font-extrabold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-green-400">
+        {stockData.symbol} - {stockData.name}
+      </h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 text-lg leading-6">
+        <p className="font-semibold">Current Price: <span className="text-blue-300">${stockData.current_price}</span></p>
+        <p className="font-semibold">Opening Price: <span className="text-blue-300">${stockData.opening_price}</span></p>
+        <p className="font-semibold">Previous Close: <span className="text-blue-300">${stockData.previous_close}</span></p>
+        <p className="font-semibold">High Price: <span className="text-blue-300">${stockData.high_price}</span></p>
+        <p className="font-semibold">Low Price: <span className="text-blue-300">${stockData.low_price}</span></p>
+        <p className="font-semibold">10 Day Avg Volume: <span className="text-blue-300">{stockData.ten_day_avg_volume}M</span></p>
+        <p className="font-semibold">3 Month Avg Volume: <span className="text-blue-300">{stockData.three_month_avg_volume}M</span></p>
+        <p className="font-semibold">Market Cap: <span className="text-blue-300">{stockData.market_cap}M</span></p>
+        <p className="font-semibold">P/E Ratio: <span className="text-blue-300">{stockData.pe_ratio}</span></p>
+        <p className="font-semibold">Annual Dividend Yield: <span className="text-blue-300">{stockData.annual_dividend_yield}%</span></p>
+        <p className="font-semibold">52 Week High: <span className="text-blue-300">${stockData['52_week_high']}</span></p>
+        <p className="font-semibold">52 Week Low: <span className="text-blue-300">${stockData['52_week_low']}</span></p>
+        <p className="font-semibold">Beta: <span className="text-blue-300">{stockData.beta}</span></p>
+        <p className="font-semibold">Exchange: <span className="text-blue-300">{stockData.exchange}</span></p>
+      </div>
+
       {action !== 'watch' && (
-        <div className="action-section">
+        <div className="action-section space-y-6">
           <input
             type="number"
             placeholder="Number of shares"
             value={shares}
             onChange={handleSharesChange}
+            className="w-full p-4 text-lg rounded-full bg-slate-800 text-blue-100 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-600 caret-blue-200 shadow-lg"
           />
-          <button onClick={handleAction}>{action === 'buy' ? 'Buy' : 'Sell'}</button>
-          <button onClick={handleAddToWatchlist} style={{ marginTop: '10px' }}>
+          <button 
+            onClick={handleAction} 
+            className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            {action === 'buy' ? 'Buy' : 'Sell'}
+          </button>
+          <button 
+            onClick={handleAddToWatchlist} 
+            className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg shadow-lg hover:bg-yellow-500 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
             Add to Watchlist
           </button>
         </div>
       )}
 
+      {action === 'watch' && <RemoveFromWatchlistButton symbol={symbol} />}
 
-      {action === 'watch' && (
-        <div className="action-section">
-          <button onClick={handleRemoveFromWatchlist} style={{ marginTop: '10px' }}>
-            Remove from Watchlist
-          </button>
+      {error && (
+        <div className="mt-6">
+          <h1 className="text-red-500 text-2xl font-bold text-center">{error}</h1>
         </div>
       )}
-
-      {/* Display any error messages */}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };

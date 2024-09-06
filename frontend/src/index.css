@@ -1,0 +1,35 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+
+@layer utilities {
+    .text-24 {
+        @apply text-[24px] leading-[30px];
+    }
+
+    .text-36 {
+        @apply text-[36px] leading-[44px];
+    }
+
+    .watch-item {
+        @apply relative flex h-[240px] w-full max-w-[390px] justify-between rounded-[20px] border border-white bg-gradient-to-r from-blue-500 to-blue-300 shadow-lg backdrop-blur-[6px];
+    }
+
+    .form-btn {
+        @apply h-[45px] w-[100px] text-[20px] leading-[24px] shadow-2xl rounded-lg border border-gray-700 bg-blue-500 font-semibold text-white hover:bg-blue-600;
+    }
+
+    .nav-link {
+        @apply relative flex items-center justify-center 
+        text-blue-500 no-underline py-2 px-4 bg-gray-400 
+        hover:bg-blue-600 dark:bg-gray-800 
+        hover:text-white rounded-3xl 
+        hover:rounded-xl transition-all duration-300 ease-linear 
+        cursor-pointer shadow-lg;
+    }
+}

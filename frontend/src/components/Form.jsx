@@ -2,7 +2,6 @@ import { useState } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";  // hook that allows us to access navigation from the code
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import "../styles/Form.css"
 import LoadingIndicator from "./LoadingIndicator";
 
 
@@ -50,10 +49,16 @@ function Form({ route, method }) {
 
 
     return (
-        <form onSubmit={handleSubmit} className="form-container">
-            <h1>{name}</h1>
+        <form onSubmit={handleSubmit} 
+        className="flex flex-col items-center justify-center mx-auto my-12 p-5 rounded-lg max-w-md"
+        style={{ boxShadow: "0 12px 20px rgba(255, 255, 255, 0.1), 0 6px 10px rgba(255, 255, 255, 0.06)"}}>
+            <h1 className="text-24 lg:text-36 font-semibold text-white">
+                {name}
+            </h1>
             <input
-                className="form-input"
+                className="w-11/12 mt-5 p-3 mb-4 rounded-lg border-0 
+                focus:outline-none focus:ring-2 focus:ring-blue-200
+                bg-gray-700 text-white placeholder-gray-400 shadow-inner"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -61,7 +66,9 @@ function Form({ route, method }) {
             />
 
             <input
-                className="form-input"
+                className="w-11/12 mt-5 p-3 mb-4 rounded-lg border-0 
+                focus:outline-none focus:ring-2 focus:ring-blue-200
+                bg-gray-700 text-white placeholder-gray-400 shadow-inner"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -70,7 +77,7 @@ function Form({ route, method }) {
             
             {loading && <LoadingIndicator />}
 
-            <button className="form-button" type="submit" disabled={loading}>
+            <button className="form-btn" type="submit" disabled={loading}>
                 {name}
             </button>
         </form>

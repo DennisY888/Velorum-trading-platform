@@ -10,9 +10,11 @@ const Sell = () => {
   };
 
   return (
-    <div className="sell-page">
-      <h1>Sell Any Stock You Own</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen px-4">
+      <div className="flex flex-col items-center">
+        <h1 className="text-5xl font-bold text-blue-100 mb-10" style={{ marginTop: '-150px' }}>Sell Your Stock</h1>
       <SearchInput onSymbolSelected={handleSymbolSelected} isSellPage={true} />
+    </div>
     </div>
   );
 };

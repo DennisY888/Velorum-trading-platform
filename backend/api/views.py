@@ -25,6 +25,7 @@ class CreateUserView(generics.CreateAPIView):
 
 
 
+
 # retrieves stock metrics data given a symbol
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -41,16 +42,17 @@ def get_stock_quote(request, symbol):
 
 
 
-#
+
+
 class PortfolioViewSet(viewsets.ModelViewSet):
     queryset = Portfolio.objects.all()
     serializer_class = PortfolioSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        user_profile = UserProfile.objects.get(user=self.request.user)
-        serializer.save(user=user_profile)
 
+    def perform_create(self, serializer):
+        user_profile = UserProfile.objects.select_related('user').get(user=self.request.user)
+        serializer.save(user=user_profile)
 
 
     # buy page
@@ -66,7 +68,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         if not stock_data:
             return Response({'error': 'Stock symbol not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
         total_cost = Decimal(stock_data['current_price']) * Decimal(shares)
 
         if user_profile.cash < total_cost:
@@ -107,7 +109,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         if not symbol or shares <= 0:
             return Response({'error': 'Invalid symbol or shares'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
         portfolio_item = get_object_or_404(Portfolio, user=user_profile, symbol=symbol)
 
         if portfolio_item.shares < shares:
@@ -151,7 +153,7 @@ class OwnedStockSearchView(APIView):
 
     def get(self, request):
         query = request.query_params.get('q', '').upper()
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
         if query:
             # Filtering owned stocks based on query
             owned_stocks = Portfolio.objects.filter(
@@ -178,8 +180,9 @@ class HistoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['get'])
     def my_history(self, request):
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
         history = self.queryset.filter(user=user_profile).order_by('-transacted')
+
 
         # Apply pagination, retrieves from database only the current pagination data
         paginator = LimitOffsetPagination()
@@ -214,7 +217,7 @@ class LeaderboardView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = UserProfile.objects.all()
+        queryset = UserProfile.objects.prefetch_related('portfolios').all()
         user_data = []
 
         for user_profile in queryset:
@@ -237,6 +240,8 @@ class LeaderboardView(generics.ListAPIView):
             data['ranking'] = index + 1
 
         return sorted_data
+
+
 
     def list(self, request, *args, **kwargs):
         query = request.query_params.get('q', '')
@@ -282,8 +287,9 @@ class IndexView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
         portfolio = Portfolio.objects.filter(user=user_profile)
+
         portfolio_data = []
 
         total_value = Decimal(0)  # Initialize as Decimal
@@ -307,6 +313,7 @@ class IndexView(generics.RetrieveAPIView):
         grand_total = current_cash + total_value  # Both are Decimals now
 
         return Response({
+            'username': request.user.username,
             'portfolio': portfolio_data,
             'cash': current_cash,
             'grand_total': grand_total,
@@ -322,14 +329,16 @@ class WatchlistViewSet(viewsets.ModelViewSet):
     serializer_class = WatchlistSerializer
     permission_classes = [IsAuthenticated]
 
+
     def get_queryset(self):
-        user_profile = UserProfile.objects.get(user=self.request.user)
+        user_profile = UserProfile.objects.select_related('user').get(user=self.request.user)
         return Watchlist.objects.filter(user=user_profile)
+
 
     @action(detail=False, methods=['get'])
     def my_watchlist(self, request):
-        user_profile = UserProfile.objects.get(user=request.user)
-        watchlist = self.get_queryset().filter(user=user_profile).order_by('-id')
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
+        watchlist = self.get_queryset().order_by('-id')
 
         # Apply pagination, retrieves from database only the current pagination data
         paginator = LimitOffsetPagination()
@@ -356,7 +365,7 @@ class WatchlistViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def add_to_watchlist(self, request):
         symbol = request.data.get('symbol')
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
 
         # Check if the symbol is already in the watchlist
         if Watchlist.objects.filter(user=user_profile, symbol=symbol).exists():
@@ -369,7 +378,7 @@ class WatchlistViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['delete'])
     def remove_from_watchlist(self, request):
         symbol = request.data.get('symbol')
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile = UserProfile.objects.select_related('user').get(user=request.user)
         watchlist_item = Watchlist.objects.filter(user=user_profile, symbol=symbol).first()
 
         if not watchlist_item:
