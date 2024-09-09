@@ -17,11 +17,14 @@ from rest_framework.response import Response
 
 
 
+
+
 # creates a new User entry, and consequently UserProfile entry
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
 
 
 
@@ -39,6 +42,7 @@ def get_stock_quote(request, symbol):
         return Response(data, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Could not retrieve stock data'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
@@ -100,6 +104,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
 
 
 
+
     # sell page
     @action(detail=False, methods=['post'])
     def sell(self, request):
@@ -141,6 +146,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
         )
 
         return Response({'message': 'Stock sold successfully'}, status=status.HTTP_200_OK)
+
 
 
 
