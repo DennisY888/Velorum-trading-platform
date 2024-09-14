@@ -54,7 +54,7 @@ const Quote = () => {
 
     const intervalId = setInterval(() => {
       fetchStockData();
-    }, 60000);
+    }, 40000);
 
     return () => clearInterval(intervalId);
   }, [fetchStockData]);

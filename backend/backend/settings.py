@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+from celery.schedules import crontab
 
 # loads environment variables from .env file, contains our hosting service details
 load_dotenv()
@@ -68,7 +69,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     "rest_framework",
-    "corsheaders"
+    "corsheaders",
+    'django_celery_beat',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -114,14 +117,45 @@ WSGI_APPLICATION = 'backend.wsgi.application'
     "PASSWORD": os.getenv("DB_PWD"),
     "HOST": os.getenv("DB_HOST"),
     "PORT": os.getenv("DB_PORT"),
-"""
 
-DATABASES = {
+
+
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+"""
+
+DATABASES = {
+    
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('RDS_DB_NAME'),
+        'USER': os.getenv('RDS_DB_USER'),
+        'PASSWORD': os.getenv('RDS_DB_PASSWORD'),
+        'HOST': os.getenv('RDS_HOSTNAME'),
+        'PORT': os.getenv('RDS_PORT'),
+    }
 }
+
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        'LOCATION': os.getenv('REDIS_URL', 'redis://master.velorumcluster.kid4z3.use2.cache.amazonaws.com:6379/0'),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            'SSL': True,  # Ensure SSL is used for connecting to Redis
+            'SOCKET_CONNECT_TIMEOUT': 10,  # Set connection timeout
+            'SOCKET_TIMEOUT': 10,  # Set socket timeout
+        }
+    }
+}
+
+
+
+
 
 
 # Password validation
@@ -168,3 +202,65 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
+
+
+
+CELERY_BROKER_URL = os.getenv('REDIS_URL')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL')
+CELERY_TIMEZONE = 'US/Eastern'
+CELERY_ENABLE_UTC = True
+
+# Optional Celery settings
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+
+
+CELERY_BEAT_SCHEDULE = {
+    'cache_all_stocks_during_trading_hours': {
+        'task': 'api.tasks.cache_all_stocks',
+        'schedule': crontab(minute='*/1', hour='9-15', day_of_week='1-5'),
+        # Runs every 1 minute from 9:00 AM to 3:59 PM EST Monday to Friday
+    },
+    'cache_stocks_at_market_close': {
+        'task': 'api.tasks.cache_all_stocks',
+        'schedule': crontab(minute=0, hour=16, day_of_week='1-5'),
+        # Runs exactly at 4:00 PM EST Monday to Friday for the final cache refresh
+    },
+    'cache_financial_and_profile_data_daily': {
+        'task': 'api.tasks.cache_financial_and_profile_data',
+        'schedule': crontab(hour=0, minute=0),  # Runs every day at midnight
+    },
+    'capture-daily-portfolio-value': {
+        'task': 'api.tasks.capture_daily_portfolio_value',
+        'schedule': crontab(minute=0, hour=17, day_of_week='1-5'),  # Run at 5 PM EST
+    },
+}
+
+
+
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = 'us-east-2'  
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+# Static files
+STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Media files
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
+
+# S3 settings
+AWS_DEFAULT_ACL = None  # Ensures the files are accessible (for public read)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+# Static files settings (optional but recommended)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Local static file storage (if any)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')   # For collectstatic

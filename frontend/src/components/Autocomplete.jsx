@@ -12,4 +12,5 @@ function Autocomplete({ suggestions, onSelect }) {
   );
 }
 
+
 export default Autocomplete;

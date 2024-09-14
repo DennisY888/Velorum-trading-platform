@@ -1,14 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import (
-    PortfolioViewSet,
-    HistoryViewSet,
-    LeaderboardView,
-    IndexView,
-    get_stock_quote,
-    OwnedStockSearchView,  # Add this view
-    WatchlistViewSet  # Add this viewset
-)
+from .views import *
 
 router = DefaultRouter()
 router.register(r'portfolio', PortfolioViewSet)
@@ -21,6 +13,8 @@ urlpatterns = [
     path('leaderboard/', LeaderboardView.as_view(), name='leaderboard'),
     path('quote/<str:symbol>/', get_stock_quote, name='get_stock_quote'),
     path('search-owned-stocks/', OwnedStockSearchView.as_view(), name='search_owned_stocks'),  # for SELL autocomplete
+    path('portfolio-history/', PortfolioHistoryView.as_view(), name='portfolio_history'),
+    path('portfolio-breakdown/', PortfolioBreakdownView.as_view(), name='portfolio_breakdown'),
 ]
 
 

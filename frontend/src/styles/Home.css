@@ -226,3 +226,34 @@
   color: #ef4444; /* Tailwind's red-500 */
   text-shadow: 0 0 8px rgba(239, 68, 68, 0.8), 0 0 12px rgba(239, 68, 68, 0.6);
 }
+
+
+
+.charts-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px; /* Add some space between the two charts */
+  margin-top: 40px;
+  margin-bottom: 50px;
+  height: auto;
+}
+
+/* Chart containers take up equal space */
+.chart-container {
+  flex: 1;
+  max-width: 48%; /* Adjust width to fit side by side */
+  height: 448px;
+}
+
+/* Ensure that on smaller screens, charts stack vertically */
+@media (max-width: 768px) {
+  .charts-container {
+    flex-direction: column;
+  }
+
+  .chart-container {
+    max-width: 100%; /* Full width on small screens */
+    margin-bottom: 20px; /* Add some space between the charts */
+  }
+}

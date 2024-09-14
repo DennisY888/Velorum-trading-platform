@@ -68,7 +68,7 @@ const Watchlist = () => {
 
 
   useEffect(() => {
-    const intervalId = setInterval(fetchUpdatedStockData, 60000); // Fetch updates every minute
+    const intervalId = setInterval(fetchUpdatedStockData, 40000); // Fetch updates every minute
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, [fetchUpdatedStockData]);
 

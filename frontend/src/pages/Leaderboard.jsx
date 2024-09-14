@@ -33,7 +33,7 @@ const Leaderboard = () => {
 
     const intervalId = setInterval(() => {
       fetchTopUsers();
-    }, 60000); // Fetch every 60 seconds
+    }, 40000); // Fetch every 60 seconds
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, [fetchTopUsers]);

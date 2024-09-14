@@ -83,3 +83,20 @@ class Watchlist(models.Model):
         indexes = [
             models.Index(fields=['user', 'symbol']),
         ]
+
+
+
+class PortfolioHistory(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='portfolio_history')
+    date = models.DateField(auto_now_add=True)  # Date of the snapshot
+    total_value = models.DecimalField(max_digits=15, decimal_places=2)  # Total portfolio value (stocks + cash)
+
+    def __str__(self):
+        return f"{self.user.user.username} - Portfolio value on {self.date}: {self.total_value}"
+
+    class Meta:
+        ordering = ['-date']
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'date'], name='unique_portfolio_history_per_day')
+        ]
+
