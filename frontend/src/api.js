@@ -5,12 +5,13 @@ import {jwtDecode} from "jwt-decode";
 
 
 // API URL Configuration
-const apiUrl = "/choreo-apis/investiq/backend/v1";
+const apiUrl = "http://3.143.240.176";
 
 
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : apiUrl,
+  // baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : apiUrl,
+  baseURL: apiUrl,
 });
 
 
