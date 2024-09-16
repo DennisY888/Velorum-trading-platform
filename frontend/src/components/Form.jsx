@@ -26,6 +26,7 @@ function Form({ route, method }) {
         try {
             // if it's login, we submit credential to our backend, and we will get the two tokens back as the result
             const res = await api.post(route, { username, password })
+            console.log(route)
             if (method === "login") {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);

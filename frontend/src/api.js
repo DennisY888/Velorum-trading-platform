@@ -5,7 +5,7 @@ import {jwtDecode} from "jwt-decode";
 
 
 // API URL Configuration
-const apiUrl = "http://3.143.240.176";
+const apiUrl = "https://myvelorum.com";
 
 
 

@@ -30,11 +30,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-5$^5v05%v-b^hc**z@j946cz9p$820we1915m1!fsvvt2dolnu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 # allows any different hosts to host our application
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['myvelorum.com', 'd37ct6eknowd73.cloudfront.net', '3.143.240.176']  # Add your actual CloudFront domain
+
 
 
 # need this configuration for using JWT tokens
@@ -205,18 +206,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    'http://your-frontend-domain.com',  # Your actual frontend domain
+    'https://myvelorum.com',  # Add your frontend domain
 ]
+CORS_ALLOWS_CREDENTIALS = True
 
-CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = [
-    'authorization',
-    'content-type',
-    'x-csrftoken',
-    'x-requested-with',
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://myvelorum.com',  # Frontend URL
 ]
-
 
 
 
