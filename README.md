@@ -1,6 +1,9 @@
 # Velorum
+
+### What does it do
+- Velorum is a virtual stock trading platform aimed to gamify the investing experience, providing global leaderboard and personalized progress visualizations to fuel engagement and interactivity. The risk-free, elegant trading operations, with an appealing interface, makes Velorum a fun but profession, competent stock trading platform for simulating stock investing.
 ### Skills
-Django REST Framework, React.js, PostgreSQL, Tailwind CSS, React Router, Axios, Relational Database Design, Integration Testing, CI/CD 
+- Django REST Framework, React.js, PostgreSQL, Tailwind CSS, React Router, Axios, Relational Database Design, Integration Testing, CI/CD 
 
 # Purpose
 - Gain competency in advanced full-stck development, involving scalability, cloud hosting with AWS, backend optimization, caching, automated task management, database indexing, contextual field serialization, data pagination, and more
