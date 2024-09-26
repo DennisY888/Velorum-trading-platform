@@ -1,6 +1,6 @@
 # Velorum
 
-### FULL Demo (Click on the image)
+### FULL Demo (57 seconds)
 <div style="text-align: center;">
   <a href="https://www.youtube.com/watch?v=_zW_LnLkzLY">
     <img src="https://github.com/DennisY888/Velorum-trading-platform/blob/main/Velorum%20Thumbnail.jpg?raw=true" alt="Watch the video" width="700"/>
