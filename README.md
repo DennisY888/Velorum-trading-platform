@@ -1,7 +1,7 @@
 # Velorum
 
 ### FULL Demo
-[![Watch the video](https://github.com/DennisY888/Velorum-trading-platform/blob/main/assets/thumbnail.png](https://github.com/DennisY888/Velorum-trading-platform/blob/main/Velorum%20Thumbnail.jpg?raw=true)](https://www.youtube.com/watch?v=_zW_LnLkzLY)
+[![Watch the video](https://github.com/DennisY888/Velorum-trading-platform/blob/main/Velorum%20Thumbnail.jpg?raw=true)](https://www.youtube.com/watch?v=_zW_LnLkzLY)
 
 
 ### What does it do
