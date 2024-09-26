@@ -1,5 +1,9 @@
 # Velorum
 
+### FULL Demo
+[![Watch the video]([https://github.com/DennisY888/Velorum-trading-platform/blob/main/assets/thumbnail.png](https://github.com/DennisY888/Velorum-trading-platform/blob/main/Velorum%20Thumbnail.jpg?raw=true))](https://www.youtube.com/watch?v=_zW_LnLkzLY)
+
+
 ### What does it do
 - Velorum is a virtual stock trading platform aimed to gamify the investing experience, providing global leaderboard and personalized progress visualizations to fuel engagement and interactivity. The risk-free, elegant trading operations, with an appealing interface, makes Velorum a fun but profession, competent stock trading platform for simulating stock investing.
 ### Skills
