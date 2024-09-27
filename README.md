@@ -18,7 +18,7 @@
 - Django REST Framework, React.js, PostgreSQL, Tailwind CSS, React Router, Axios, Relational Database Design, Integration Testing, CI/CD 
 
 # Purpose
-- Gain competency in advanced full-stck development, involving scalability, cloud hosting with AWS, backend optimization, caching, automated task management, database indexing, contextual field serialization, data pagination, and more
+- Gain competency in advanced full-stack development, involving scalability, cloud hosting with AWS, backend optimization, caching, automated task management, database indexing, contextual field serialization, data pagination, and more
 - Gain extensice frontend development experience with React, API fetching, user-driven events, animations, data visualizations, and UI state management with asynchronous processing
 
 ### Features Worth Noting
