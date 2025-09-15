@@ -1,3 +1,5 @@
+// frontend/src/pages/Leaderboard.jsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import api from "../api";
 import debounce from 'lodash.debounce'; // delays triggering of API call for autocomplete search

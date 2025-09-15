@@ -1,3 +1,5 @@
+// frontend/src/pages/CannotAfford.jsx
+
 import React from 'react'
 
 const CannotAfford = () => {

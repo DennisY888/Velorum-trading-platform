@@ -1,3 +1,5 @@
+// frontend/src/components/ProtectedRoute.jsx
+
 // a wrapper for any protected route
 // we need to have an authorization token before accessing this route
 

@@ -1,3 +1,5 @@
+// frontend/src/components/Autocomplete.jsx
+
 import React from "react";
 
 function Autocomplete({ suggestions, onSelect }) {

@@ -1,3 +1,5 @@
+// frontend/src/pages/Quote.jsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import api from "../api";
 import { useNavigate, useSearchParams } from 'react-router-dom';

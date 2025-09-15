@@ -1,3 +1,5 @@
+// frontend/src/pages/Home.jsx
+
 import React, { useState, useEffect, useCallback } from "react";
 import api from "../api";
 import "../styles/Home.css";

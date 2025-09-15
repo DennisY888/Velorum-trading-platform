@@ -1,3 +1,5 @@
+// frontend/src/pages/Sell.jsx
+
 import React from 'react';
 import SearchInput from "../components/SearchInput";
 import { useNavigate } from 'react-router-dom';

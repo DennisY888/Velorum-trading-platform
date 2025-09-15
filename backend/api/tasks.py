@@ -1,4 +1,6 @@
-# api/tasks.py
+# backend/api/tasks.py
+
+
 from celery import shared_task, Celery
 from celery.schedules import crontab
 from django.core.cache import cache

@@ -1,3 +1,5 @@
+// frontend/src/components/SearchInput.jsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import api from "../api";
 import debounce from 'lodash.debounce';

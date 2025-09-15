@@ -1,3 +1,5 @@
+// frontend/src/pages/History.jsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api';
 import "../styles/History.css";
