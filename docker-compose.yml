@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # 1. The Database (PostgreSQL 15)
+  # Resume Claim: "PostgreSQL"
+  db:
+    image: postgres:15-alpine
+    container_name: velorum_db
+    environment:
+      POSTGRES_DB: velorum_db
+      POSTGRES_USER: velorum_user
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. The Cache (Redis 7)
+  # Resume Claim: "Redis"
+  redis:
+    image: redis:7-alpine
+    container_name: velorum_redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
