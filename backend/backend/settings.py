@@ -1,69 +1,30 @@
 # backend/backend/settings.py
 
-"""
-I changed:
-database config
-redis config
-REDIS_BROKER_URL
-REDIS_RESULT_BACKEND
-
-on EC2
-try setting debug to true
-try fixing CORS_ALLOW_CREDENTIALS
-"""
-
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
 from celery.schedules import crontab
 
-# loads environment variables from .env file, contains our hosting service details
+# Load environment variables
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5$^5v05%v-b^hc**z@j946cz9p$820we1915m1!fsvvt2dolnu'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-5$^5v05%v-b^hc**z@j946cz9p$820we1915m1!fsvvt2dolnu')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-
-# allows any different hosts to host our application
-ALLOWED_HOSTS = ['myvelorum.com', 'd37ct6eknowd73.cloudfront.net', '3.143.240.176', "localhost", '127.0.0.1']  # Add your actual CloudFront domain
-
-
-
-# need this configuration for using JWT tokens
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
-}
-
-# specify the life time of our JWT token
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-}
-
-
-
-
-
+# ALLOWED_HOSTS
+# We add 'backend' to allow Docker containers to talk to each other
+ALLOWED_HOSTS = ['myvelorum.com', 'd37ct6eknowd73.cloudfront.net', '3.143.240.176', "localhost", '127.0.0.1', 'backend']
 
 # Application definition
-
 INSTALLED_APPS = [
+    'daphne', # Must be at the top for ASGI/WebSockets support
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,10 +32,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
-    "rest_framework",
-    "corsheaders",
+    'rest_framework',
+    'corsheaders',
     'django_celery_beat',
     'storages',
+    'channels', # Required for WebSockets
 ]
 
 MIDDLEWARE = [
@@ -106,197 +68,152 @@ TEMPLATES = [
     },
 ]
 
+# --- ARCHITECTURE CHANGE: ASGI for WebSockets ---
+# Resume Claim: "Utilizing WebSocket connections"
+# We switch from WSGI (Sync) to ASGI (Async) as the primary entry point
 WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'backend.asgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-
-""" database host setting
-    "ENGINE": "django.db.backends.postgresql",
-    "NAME": os.getenv("DB_NAME"),
-    "USER": os.getenv("DB_USER"),
-    "PASSWORD": os.getenv("DB_PWD"),
-    "HOST": os.getenv("DB_HOST"),
-    "PORT": os.getenv("DB_PORT"),
-
-
-
-    THIS IS THE ACTUAL ONE FOR AWS
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('RDS_DB_NAME'),
-        'USER': os.getenv('RDS_DB_USER'),
-        'PASSWORD': os.getenv('RDS_DB_PASSWORD'),
-        'HOST': os.getenv('RDS_HOSTNAME'),
-        'PORT': os.getenv('RDS_PORT'),
-    }
-"""
-
-DATABASES = {
-
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
-"""
-"default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        'LOCATION': os.getenv('REDIS_URL', 'redis://master.velorumcluster.kid4z3.use2.cache.amazonaws.com:6379/0'),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            'SSL': True,  # Ensure SSL is used for connecting to Redis
-            'SOCKET_CONNECT_TIMEOUT': 10,  # Set connection timeout
-            'SOCKET_TIMEOUT': 10,  # Set socket timeout
+# --- ARCHITECTURE CHANGE: PostgreSQL (Resume Claim) ---
+# If DB_HOST is set (e.g., by Docker), use PostgreSQL.
+# Otherwise, fall back to SQLite (so you can verify things locally if needed).
+if os.getenv('DB_HOST'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'velorum_db'),
+            'USER': os.getenv('DB_USER', 'velorum_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'password123'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT', '5432'),
         }
     }
-"""
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# --- ARCHITECTURE CHANGE: Redis & Channels ---
+# Resume Claim: "Engineered Redis caching" & "WebSockets"
+
+# 1. Redis Cache Config
+# Note: SSL is disabled for local Docker/Dev. Enable it only if using AWS ElastiCache.
+REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1')
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        "LOCATION": REDIS_URL,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            'SSL': True,  # Ensure SSL is used for connecting to Redis
-            'SOCKET_CONNECT_TIMEOUT': 10,  # Set connection timeout
-            'SOCKET_TIMEOUT': 10,  # Set socket timeout
+            # 'SSL': True,  <-- DISABLED for local Docker development
         }
     }
 }
 
-
-
-
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+# 2. Channels Layer (WebSockets glue)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [REDIS_URL],
+        },
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+}
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-
-
-
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [
-    'https://myvelorum.com',  # Add your frontend domain
-    "http://localhost:5173"
-]
-CORS_ALLOW_CREDENTIALS = True
-
-
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://myvelorum.com',  # Frontend URL
-    "http://localhost:5173"
-]
-
-
-
-
-
-"""
-CELERY_BROKER_URL = os.getenv('REDIS_URL')
-CELERY_RESULT_BACKEND = os.getenv('REDIS_URL')
-"""
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+# --- CELERY CONFIG ---
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/1')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/1')
 CELERY_TIMEZONE = 'US/Eastern'
 CELERY_ENABLE_UTC = True
-
-# Optional Celery settings
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-
-
 
 CELERY_BEAT_SCHEDULE = {
     'cache_all_stocks_during_trading_hours': {
         'task': 'api.tasks.cache_all_stocks',
         'schedule': crontab(minute='*/1', hour='9-15', day_of_week='1-5'),
-        # Runs every 1 minute from 9:00 AM to 3:59 PM EST Monday to Friday
     },
     'cache_stocks_at_market_close': {
         'task': 'api.tasks.cache_all_stocks',
         'schedule': crontab(minute=0, hour=16, day_of_week='1-5'),
-        # Runs exactly at 4:00 PM EST Monday to Friday for the final cache refresh
     },
     'cache_financial_and_profile_data_daily': {
         'task': 'api.tasks.cache_financial_and_profile_data',
-        'schedule': crontab(hour=0, minute=0),  # Runs every day at midnight
+        'schedule': crontab(hour=0, minute=0),
     },
     'capture-daily-portfolio-value': {
         'task': 'api.tasks.capture_daily_portfolio_value',
-        'schedule': crontab(minute=0, hour=17, day_of_week='1-5'),  # Run at 5 PM EST
+        'schedule': crontab(minute=0, hour=17, day_of_week='1-5'),
     },
 }
 
+# --- JWT AUTHENTICATION ---
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
 
+# --- PASSWORD VALIDATION ---
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
 
+# --- INTERNATIONALIZATION ---
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# --- STATIC FILES & AWS S3 ---
+# If AWS keys are present, use S3. Otherwise use local static files.
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = 'us-east-2'  
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
-# Static files
-STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+if AWS_ACCESS_KEY_ID:
+    AWS_S3_REGION_NAME = 'us-east-2'  
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
+    AWS_DEFAULT_ACL = None
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+else:
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Media files
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# S3 settings
-AWS_DEFAULT_ACL = None  # Ensures the files are accessible (for public read)
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    'https://myvelorum.com',
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
 
-# Static files settings (optional but recommended)
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Local static file storage (if any)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')   # For collectstatic
+CSRF_TRUSTED_ORIGINS = [
+    'https://myvelorum.com',
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
